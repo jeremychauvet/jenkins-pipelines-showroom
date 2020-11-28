@@ -1,0 +1,51 @@
+pipeline {
+  agent { label 'master' }
+
+  options {
+    buildDiscarder(logRotator(
+      numToKeepStr: '5',
+      daysToKeepStr: '5',
+      artifactNumToKeepStr: '5',
+      artifactDaysToKeepStr: '5'
+    ))
+    disableResume()
+    timeout(time: 1, unit: 'MINUTES')
+  }
+
+  parameters {
+    booleanParam(name: 'WARM_UP', defaultValue: false, description: 'Please check this to refresh job configuration')
+  }
+
+  stages {
+    stage('Warm up') {
+      when {
+        expression { params.WARM_UP == true }
+      }
+      steps {
+        script {
+          env.ENVIRONMENT = "WARM-UP"
+          print 'Configuration reloaded.'
+        }
+      }
+    }
+    stage('Build') {
+      steps {
+        script {
+          print '[INFO] Build success.'
+        }
+      }
+    }
+    stage('Artifact') {
+      steps {
+        script {
+          print '[INFO] Artifact success.'
+        }
+      }
+    }
+  }
+  post {
+    always {
+      cleanWs disableDeferredWipeout: true, deleteDirs: true
+    }
+  }
+}
