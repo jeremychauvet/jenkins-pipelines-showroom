@@ -31,6 +31,7 @@ pipeline {
     stage('Build') {
       steps {
         script {
+          sh "hostname > hostname.txt"
           print '[INFO] Build success.'
         }
       }
@@ -38,6 +39,7 @@ pipeline {
     stage('Artifact') {
       steps {
         script {
+          archiveArtifacts artifacts: 'hostname.txt', fingerprint: true
           print '[INFO] Artifact success.'
         }
       }
